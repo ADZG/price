@@ -1,0 +1,90 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Hero - Admin</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+        .hero-list img {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="page-header container">
+            <h1>王者荣耀 <small>英雄管理器</small></h1>
+        </div>
+    </header>
+    <div class="container hero-list">
+        <form id='myform'>
+            <!-- <input type="hidden" name="img" id="img1"> -->
+            <table class="table table-hover">
+                <tbody><tr>
+                    <td>姓名：</td>
+                    <td><input type="text" name="name"></td>
+                </tr>
+                <tr>
+                    <td>性别：</td>
+                    <td><input id="nan" name="gender" value="男" type="radio"><label for="nan">男</label> <input name="gender" value="女" type="radio" id="nv"><label for="nv">女</label></td>
+                </tr>
+                <tr>
+                    <td>头像：</td>
+                    <td><img src="/images/0.jpg" alt="" id="photo" width="100" style='border: 1px solid #ccc;margin-bottom: 5px;'>
+                    <input type="file" id="img"></td>
+                    <input type="hidden" id="myimg" value="" name='img'>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" id="sub" value="新增"></td>
+                </tr>
+            </tbody></table>
+        </form>
+    </div>
+<script src="/js/jquery.min.js"></script>
+<script>
+$(function(){
+    $("#img").on("change",function(){
+        // 获取file的文件内容
+        var myfile=$("#img")[0].files[0];
+        var formdata=new FormData();
+        // img是服务端的参数名
+        formdata.append("img",myfile)  
+        $.ajax({
+            type:"post",
+            url:"/uploadFile",
+            dataType:"json",
+            data:formdata,
+            processData:false,
+            contentType:false,
+            success:function(res){
+                $("#photo").attr("src","/images/"+res.img)
+                // 将获取到的响应体数据，放在隐藏的表单控件中， 
+                // 将图片的数据保存在隐藏域，第一，方便做ajax请求时，直接使用serialize方式从隐藏域中直接获取图片数据，上传到后台
+                $("#myimg").val(res.img)
+            }
+        })
+    })
+   
+    $("#sub").on("click",function(){
+        $.ajax({
+            type:"post",
+            url:"/add",
+            dataType:"json",
+            data:$("#myform").serialize(),
+            beforeSend:()=>{
+                if($("#myimg").val()==""){
+                    $("#myimg").val("0.jpg")
+                }
+            },
+            success:function(res){
+                if(res.code==200){
+                    alert(res.msg)
+                    location.href="/"
+                }
+            }
+        })
+    })
+})
+</script>
+</body>
+</html>

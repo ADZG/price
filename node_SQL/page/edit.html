@@ -1,0 +1,94 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hero - Admin</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+        .hero-list img {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="page-header container">
+            <h1>王者荣耀 <small>英雄管理器</small></h1>
+        </div>
+    </header>
+    <div class="container hero-list">
+        <form>
+            <table class="table table-hover">
+                <tbody>
+                    <input type="hidden" name="img" class="myimg" value="{{img}}">
+                    <input type="hidden" name="id" class="myid" value="{{id}}">
+                    <tr>
+                        <td>姓名：</td>
+                        <td><input type="text" name="name" value="{{name}}"></td>
+                    </tr>
+                    <tr>
+                        <td>性别：</td>
+                        <td>
+                            <input id="nan" name="gender" value="男" type="radio" {{gender=="男"?"checked":""}}><label for="nan">男</label>
+                            <input name="gender" value="女" type="radio" {{gender=="女"?"checked":""}} id="nv"><label for="nv">女</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>头像：</td>
+                        <td><img src="/images/{{img}}" alt="" id="photo" width="100" style='border: 1px solid #ccc;margin-bottom: 5px;'>
+                            <input type="file" id="img"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="button" id="sub" value="编辑"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+<body>
+    <script src="/js/jquery.min.js"></script>
+    <script> 
+        $(()=>{
+            $("#img").on("change", () => {
+                // files方法是dom方法
+                var myfile = $("#img")[0].files[0]
+                var formdata = new FormData()
+                // img为服务端提供的参数
+                formdata.append("img", myfile)
+                console.log(myfile)
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    data: formdata,
+                    // 如果使用formdata，一定要配合使用两个编码
+                    contentType: false,
+                    processData: false,
+                    url: "/uploadFile",
+                    success: function (res) {
+                        $("#photo").attr("src", "/images/" + res.img)
+                        $("#myimg").val(res.img)
+                    }
+                })
+            })
+
+            $("#sub").on("click", () => {
+                $.ajax({
+                    type: "post",
+                    data: $("form").serialize(),
+                    dataType: "json",
+                    url: "/edit",
+                    success: (res) => {
+                        if (res.code == 200) {
+                            alert(res.msg)
+                            location.href = "/"
+                            console.log(res)
+                        }
+                    }
+                })
+            })
+        })
+    
+    </script>
+</html>
